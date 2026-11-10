@@ -33,6 +33,8 @@ After every implementation:
 
 - Preserve `dotfiles` runtime-state paths when relocating checkout paths to `arch-desktop`.
 - Keep only Arch desktop installers here. Headless installers, the main `setup/boot.sh` entry point (which hands Arch targets to this repo's `setup/boot.sh`), and setup helpers shared with them live in dotfiles `setup/`; call those helpers through `portable/setup/common/`.
+- `portable/` is the dotfiles checkout itself. Make portable configuration and shared setup changes there, following dotfiles' `AGENTS.md` and running its tests.
+- Move retired files to `Zihad550/dotfiles-archive` under a topic folder that keeps their original paths; see ADR 0041.
 
 - Do not alias the Zsh `break` builtin; it turned the devvm startup loop into a repeating 10-minute Pomodoro timer.
 - Write code comments only for what the code can't say for itself: a non-obvious
