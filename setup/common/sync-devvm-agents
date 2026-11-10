@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# Copy the agents' dotfiles settings into devvm's agent store. See README.md "devvm".
+
+set -euo pipefail
+
+ARCH_DESKTOP_DIR="${ARCH_DESKTOP_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
+store="${XDG_CONFIG_HOME:-$HOME/.config}/devvm/agents"
+
+if [[ ! -d "$store" ]]; then
+    echo "no $store: run setup/common/setup-devvm first" >&2
+    exit 1
+fi
+
+# Not devvm agent import: it skips stow's links, and it would replace the
+# logins VMs saved with the host's.
+DOTFILES_DIR="${DOTFILES_DIR:-$ARCH_DESKTOP_DIR/portable}"
+for agent_dir in claude/.claude codex/.codex opencode/.config/opencode; do
+    agent=${agent_dir%%/*}
+    git -C "$DOTFILES_DIR/$agent" ls-files -z -- "${agent_dir#*/}" |
+        rsync -tL --from0 --ignore-missing-args --files-from=- "$DOTFILES_DIR/$agent/" "$store/$agent/"
+done

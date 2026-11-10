@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ARCH_DESKTOP_DIR="${ARCH_DESKTOP_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
+DOTFILES_DIR="${DOTFILES_DIR:-$ARCH_DESKTOP_DIR/portable}"
+DOTFILES="$DOTFILES_DIR" "$DOTFILES_DIR/scripts/stow/stow-base"
+stow --no-folding --dir "$ARCH_DESKTOP_DIR" --target "$HOME" kanata dotfiles
+"$ARCH_DESKTOP_DIR/setup/common/voxtype/seed-config"
+"$ARCH_DESKTOP_DIR/setup/arch-workstation/setup-herdr-app-config"

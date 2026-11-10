@@ -1,0 +1,6 @@
+#!/bin/bash
+
+export DF_WEBAPP_PACKAGE_REPLAY=1
+
+# Web apps installed on the Arch devbox by df-webapp-install.
+~/arch-desktop/bin/df-webapp-install "MonkeyType" "https://monkeytype.com"

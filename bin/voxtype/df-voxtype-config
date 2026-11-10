@@ -1,0 +1,4 @@
+#!/bin/bash
+set -e
+
+exec df-launch-floating-presentation "voxtype configure"

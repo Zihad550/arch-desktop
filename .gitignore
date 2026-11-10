@@ -1,0 +1,6 @@
+portable
+resources
+node_modules
+__pycache__/
+*.pyc
+themes/**/background

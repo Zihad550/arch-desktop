@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+# Power management for this box. See ../../portable/setup/common/setup-tuned for
+# the profile and README.md "power management" for the reasoning.
+#
+# Runs from init's non-laptop branch only; the laptop gets
+# ../arch-workstation/setup-packages/setup-tlp instead.
+
+set -euo pipefail
+
+export TUNED_PROFILE_NAME=arch-devbox
+
+exec "$(dirname "${BASH_SOURCE[0]}")/../../portable/setup/common/setup-tuned" "$@"

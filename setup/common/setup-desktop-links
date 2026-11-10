@@ -1,0 +1,88 @@
+#!/usr/bin/env python3
+"""Relocate existing managed links and expose desktop commands without restarting the session."""
+import argparse
+import os
+from pathlib import Path
+import shlex
+import shutil
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--dry-run", action="store_true")
+args = parser.parse_args()
+root = Path(__file__).resolve().parents[2]
+portable = (root / "portable").resolve()
+home = Path.home()
+desktop_packages = {path.name for path in root.iterdir()
+                    if path.name != "portable" and (path / ".config").is_dir()} | {"themes"}
+
+def link(source, target):
+    print(f"{target} -> {source}")
+    if not args.dry_run:
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.unlink(missing_ok=True)
+        target.symlink_to(source)
+
+for folder in [home / ".config", home / ".local/share", home / ".local/bin"]:
+    if not folder.is_dir() or folder.is_symlink():
+        continue
+    for directory, dirs, files in os.walk(folder, followlinks=False):
+        dirs[:] = [d for d in dirs if d not in {"node_modules", "cache", "Cache", ".git"}]
+        for name in dirs + files:
+            target = Path(directory) / name
+            if not target.is_symlink():
+                continue
+            old = Path(os.path.abspath(target.parent / os.readlink(target)))
+            try:
+                relative = old.relative_to(portable)
+            except ValueError:
+                continue
+            if not relative.parts:
+                continue
+            if old.exists() and relative.parts[0] not in desktop_packages:
+                continue
+            source = root / relative
+            if source.exists():
+                link(source, target)
+
+# The old portable package linked directly to the active desktop theme.
+lazygit = home / ".config/lazygit"
+managed_lazygit = portable / "lazygit/.config/lazygit"
+theme_config = home / ".config/theme/lazygit.yml"
+if theme_config.is_file():
+    folded = lazygit.is_symlink() and lazygit.resolve() == managed_lazygit
+    config = lazygit / "config.yml"
+    linked = config.is_symlink() and Path(os.path.abspath(config.parent / os.readlink(config))) == managed_lazygit / "config.yml"
+    if folded or linked:
+        if folded and not args.dry_run:
+            lazygit.unlink()
+            shutil.copytree(managed_lazygit, lazygit, symlinks=True)
+        link(theme_config, config)
+
+marker = "# Managed by arch-desktop setup-desktop-links."
+for source in sorted((root / "bin").glob("*")) + sorted((root / "bin/voxtype").glob("*")):
+    if not source.is_file() or not os.access(source, os.X_OK):
+        continue
+    target = home / ".local/bin" / source.name
+    if target.is_symlink():
+        old = Path(os.path.abspath(target.parent / os.readlink(target)))
+        if old not in {source, portable / "bin" / source.name, portable / "bin/voxtype" / source.name}:
+            print(f"keeping existing command link: {target}")
+            continue
+    elif target.exists():
+        if not target.is_file() or marker not in target.read_text(errors="replace").splitlines()[:2]:
+            print(f"keeping existing command: {target}")
+            continue
+    # Execute the real file so BASH_SOURCE remains anchored in this checkout.
+    path_prefix = shlex.quote(":".join(str(path) for path in
+                                     [root / "bin", root / "bin/voxtype", portable / "bin"]))
+    wrapper = ("#!/bin/sh\n" + marker + "\n"
+               + "export ARCH_DESKTOP_DIR=" + shlex.quote(str(root)) + "\n"
+               + "export PATH=" + path_prefix + ':"$PATH"\n'
+               + "exec " + shlex.quote(str(source)) + ' "$@"\n')
+    print(f"{target} executes {source}")
+    if not args.dry_run:
+        target.parent.mkdir(parents=True, exist_ok=True)
+        if target.is_symlink():
+            target.unlink()
+        target.write_text(wrapper)
+        target.chmod(0o755)

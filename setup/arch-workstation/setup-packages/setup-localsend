@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# shellcheck source=../../common/pacman-lib
+. "$(dirname "${BASH_SOURCE[0]}")/../../common/pacman-lib"
+
+ARCH_DESKTOP_DIR="${ARCH_DESKTOP_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)}"
+
+pacman_install localsend nautilus-python python-gobject xdg-desktop-portal-gtk
+
+extensions="$HOME/.local/share/nautilus-python/extensions"
+mkdir -p "$extensions"
+ln -sfn "$ARCH_DESKTOP_DIR/setup/arch-workstation/localsend/localsend.py" "$extensions/localsend.py"

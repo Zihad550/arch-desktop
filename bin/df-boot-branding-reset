@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+ARCH_DESKTOP_DIR="${ARCH_DESKTOP_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+"$ARCH_DESKTOP_DIR/setup/common/boot-branding/apply"
+"$ARCH_DESKTOP_DIR/setup/common/greeter/apply"
+echo "Pinned Boot Branding restored"

@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+ARCH_DESKTOP_DIR="${ARCH_DESKTOP_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
+config_dir="${HERDR_APP_HOME:-$HOME/.config/herdr-app}"
+source_dir="$ARCH_DESKTOP_DIR/herdr-app/.config/herdr-app"
+
+mkdir -p "$config_dir/layouts"
+backup_dir=$(mktemp -d "$config_dir/.dotfiles-backup.XXXXXX")
+for file in keys.json settings.json layouts/dotfiles.json layouts/dotfiles.svg; do
+  if [[ -e "$config_dir/$file" || -L "$config_dir/$file" ]]; then
+    mkdir -p "$backup_dir/$(dirname "$file")"
+    cp -L -- "$config_dir/$file" "$backup_dir/$file"
+  fi
+  cp --remove-destination -- "$source_dir/$file" "$config_dir/$file"
+done
+
+printf 'Installed Herdr app config. Previous files: %s\n' "$backup_dir"
+printf 'With Herdr running, select the layout: herdr-app do layout.switch --name dotfiles\n'
+printf 'Then inspect: herdr-app status\n'

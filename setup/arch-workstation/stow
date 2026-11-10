@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+ARCH_DESKTOP_DIR="${ARCH_DESKTOP_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
+cd "$ARCH_DESKTOP_DIR"
+
+stow --no-folding --dir "${DOTFILES_DIR:-$HOME/dotfiles}" --target "$HOME" ghostty
+stow --no-folding --dir "${ARCH_DESKTOP_DIR:-$HOME/arch-desktop}" --target "$HOME" kanata
+stow --no-folding --dir "${DOTFILES_DIR:-$HOME/dotfiles}" --target "$HOME" zsh
+stow --no-folding --dir "${DOTFILES_DIR:-$HOME/dotfiles}" --target "$HOME" zed
+mkdir -p "$HOME/.local/share/zed/extensions"
+ln -snf "$HOME/.config/zed/backup/extensions/index.json" \
+    "$HOME/.local/share/zed/extensions/index.json"
+stow --no-folding --dir "${DOTFILES_DIR:-$HOME/dotfiles}" --target "$HOME" starship
+"$ARCH_DESKTOP_DIR/setup/common/voxtype/seed-config"
+stow --no-folding --dir "${DOTFILES_DIR:-$HOME/dotfiles}" --target "$HOME" procs
+stow --no-folding --dir "${DOTFILES_DIR:-$HOME/dotfiles}" --target "$HOME" atuin
+stow --no-folding --dir "${ARCH_DESKTOP_DIR:-$HOME/arch-desktop}" --target "$HOME" dotfiles
+
+# Herdr keeps sessions and sockets beside its config, so stow only the file.
+mkdir -p "$HOME/.config/herdr"
+ln -snf "$ARCH_DESKTOP_DIR/portable/herdr/.config/herdr/config.toml" \
+    "$HOME/.config/herdr/config.toml"
+
+# Only layers/ is managed; the rest of ~/.config/devvm is devvm's state.
+mkdir -p "$HOME/.config/devvm"
+if [[ -d "$HOME/.config/devvm/layers" && ! -L "$HOME/.config/devvm/layers" ]]; then
+    echo "warning: ~/.config/devvm/layers is a real folder; move its layers into $ARCH_DESKTOP_DIR/portable/devvm and rerun" >&2
+else
+    ln -snf "$ARCH_DESKTOP_DIR/portable/devvm/.config/devvm/layers" "$HOME/.config/devvm/layers"
+fi
+
+rm -rf "$HOME/.bashrc"
+stow --no-folding --dir "${DOTFILES_DIR:-$HOME/dotfiles}" --target "$HOME" bash
+
+"$ARCH_DESKTOP_DIR/setup/arch-workstation/setup-herdr-app-config"

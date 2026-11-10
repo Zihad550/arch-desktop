@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+# Keep this box awake and reachable. See
+# ../../portable/setup/common/setup-no-sleep and README.md "staying awake".
+#
+# On a laptop this means the battery runs flat instead of suspending — the
+# intended trade for a machine you reach over the tailnet.
+
+set -euo pipefail
+
+ARCH_DESKTOP_DIR="${ARCH_DESKTOP_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
+
+exec "$(dirname "${BASH_SOURCE[0]}")/../../portable/setup/common/setup-no-sleep" "$@"

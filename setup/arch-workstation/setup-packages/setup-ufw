@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+set -e
+
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=../../../portable/setup/common/ufw-lib
+. "$HERE/../../../portable/setup/common/ufw-lib"
+
+ufw_bootstrap
+
+sudo ufw deny SSH
+sudo ufw allow 53317/tcp comment 'LocalSend'
+sudo ufw allow 53317/udp comment 'LocalSend'
+
+ufw_commit

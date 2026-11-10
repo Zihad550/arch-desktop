@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+ARCH_DESKTOP_DIR="${ARCH_DESKTOP_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
+cd "$ARCH_DESKTOP_DIR"
+
+stow --no-folding --dir "${ARCH_DESKTOP_DIR:-$HOME/arch-desktop}" --target "$HOME" hypr
+stow --no-folding --dir "${ARCH_DESKTOP_DIR:-$HOME/arch-desktop}" --target "$HOME" quickshell
+stow --no-folding --dir "${ARCH_DESKTOP_DIR:-$HOME/arch-desktop}" --target "$HOME" swappy
