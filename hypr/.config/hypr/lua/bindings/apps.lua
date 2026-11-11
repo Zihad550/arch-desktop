@@ -69,7 +69,7 @@ o.bind("SUPER + SHIFT + C", "Calendar",
 o.bind("SUPER + SHIFT + M", "Meet",
     dotfiles_bin .. [[/df-launch-special-webapp "chrome-meet.google.com__-Profile_2" "https://meet.google.com" "meet"]])
 o.bind("SUPER + Z", "Zulip",
-    dotfiles_bin .. [[/df-launch-special-webapp "chrome-zulip.example.com__-Profile_2" "https://zulip.example.com" "zulip"]])
+    dotfiles_bin .. [[/df-launch-special-webapp "chrome-mamacrm.zulipchat.com__-Profile_2" "https://mamacrm.zulipchat.com" "zulip"]])
 o.bind("SUPER + Y", "YouTube",
     dotfiles_bin .. [[/df-launch-special-webapp "chrome-www.youtube.com__-Profile_2" "https://www.youtube.com" "yt"]])
 o.bind("SUPER + T", "Linear",
