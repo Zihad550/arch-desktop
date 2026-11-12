@@ -5,6 +5,10 @@ desktop, SSH and Tailscale clients, Herdr, Zed, Neovim, and database clients.
 It does not provision general language toolchains, container engines, local AI
 coding agents, or development services.
 
+Devvm and its default shell layer provide the local development environment.
+Mise packages, Claude Code and skills are installed inside the VMs. The host
+daily updater only refreshes devvm settings.
+
 Syncthing runs as a user service. Its setup does not create or configure a
 local `~/dev` tree. The firewall does not open Syncthing inbound, so this
 machine must initiate connections to configured peers.

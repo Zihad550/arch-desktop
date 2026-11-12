@@ -46,11 +46,20 @@ elif [[ "${HERDR_ENV:-}" != 1 ]]; then
     exit 1
 fi
 
+if [[ ${DOTFILES_PROFILE:-} == arch-workstation ]]; then
+    settings_pane=$("${herdr[@]}" tab create --workspace "$HERDR_WORKSPACE_ID" --cwd "$PWD" --label "devvm settings update" --no-focus | jq -er '.result.root_pane.pane_id')
+    devvm_sync_cmd=$(printf '%q' "$ARCH_DESKTOP_DIR/setup/common/sync-devvm-agents")
+    "${herdr[@]}" pane run "$settings_pane" "if command -v devvm >/dev/null; then $devvm_sync_cmd; fi"
+    exit 0
+fi
+
 skills_pane=$("${herdr[@]}" tab create --workspace "$HERDR_WORKSPACE_ID" --cwd "$PWD" --label "skills update" --no-focus | jq -er '.result.root_pane.pane_id')
 mise_pane=$("${herdr[@]}" tab create --workspace "$HERDR_WORKSPACE_ID" --cwd "$PWD" --label "mise update" --no-focus | jq -er '.result.root_pane.pane_id')
 integrations_pane=$("${herdr[@]}" tab create --workspace "$HERDR_WORKSPACE_ID" --cwd "$PWD" --label "herdr integrations update" --no-focus | jq -er '.result.root_pane.pane_id')
 
-# Not `skills update -g`; see setup/common/README.md "Agent skills".
-"${herdr[@]}" pane run "$skills_pane" "$(printf '%q' "$ARCH_DESKTOP_DIR/portable/setup/common/setup-skills")"
+# Not `skills update -g`; see setup/common/README.md "Agent skills" and "devvm".
+skills_cmd=$(printf '%q' "$ARCH_DESKTOP_DIR/portable/setup/common/setup-skills")
+devvm_sync_cmd=$(printf '%q' "$ARCH_DESKTOP_DIR/setup/common/sync-devvm-agents")
+"${herdr[@]}" pane run "$skills_pane" "$skills_cmd && { ! command -v devvm >/dev/null || $devvm_sync_cmd; }"
 "${herdr[@]}" pane run "$mise_pane" "mise up"
 "${herdr[@]}" pane run "$integrations_pane" "$(printf '%q' "$ARCH_DESKTOP_DIR/portable/setup/common/setup-herdr-integrations")"

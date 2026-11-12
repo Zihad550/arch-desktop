@@ -40,7 +40,7 @@ esac
     const env = {
         ...process.env, HOME: home, XDG_STATE_HOME: path.join(home, "state"),
         PATH: `${bin}:/usr/bin:/bin`, HERDR_BIN_PATH: path.join(bin, "herdr"),
-        ARCH_DESKTOP_DIR: ROOT, HERDR_ENV: "", HERDR_WORKSPACE_ID: "wrong-workspace",
+        ARCH_DESKTOP_DIR: ROOT, DOTFILES_PROFILE: "arch-devbox", HERDR_ENV: "", HERDR_WORKSPACE_ID: "wrong-workspace",
         HERDR_SOCKET_PATH: "wrong-socket"
     };
     return {
@@ -68,6 +68,24 @@ test("daily dispatch targets personal once per date and survives launcher restar
     h.setClock("2026-10-17 08");
     assert.equal(h.run().status, 0);
     assert.equal(h.calls().filter(call => call.includes("tab create")).length, 6);
+});
+
+test("the skills tab syncs devvm's agent store after the skills update", t => {
+    const h = fixture(t);
+    assert.equal(h.run().status, 0);
+    const skills = h.calls().find(call => call.includes("pane run") && call.includes("setup-skills"));
+    assert.match(skills, /setup-skills && \{ ! command -v devvm >\/dev\/null \|\| \S*sync-devvm-agents; \}/);
+});
+
+test("Arch workstation updates only devvm settings", t => {
+    const h = fixture(t);
+    const result = h.run(undefined, { DOTFILES_PROFILE: "arch-workstation" });
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(h.calls().filter(call => call.includes("tab create")).length, 1);
+    const runs = h.calls().filter(call => call.includes("pane run"));
+    assert.equal(runs.length, 1);
+    assert.match(runs[0], /sync-devvm-agents/);
+    assert.doesNotMatch(runs[0], /setup-skills|mise up|setup-herdr-integrations/);
 });
 
 for (const hour of ["00", "09", "12", "18", "23"]) {
