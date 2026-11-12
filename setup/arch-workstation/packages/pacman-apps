@@ -55,6 +55,7 @@ pacman_install \
 # enables gcr-ssh-agent.service, which is how ssh keys get unlocked here.
 pacman_install \
     nautilus \
+    ffmpegthumbnailer \
     nautilus-image-converter \
     gnome-disk-utility \
     gnome-font-viewer \

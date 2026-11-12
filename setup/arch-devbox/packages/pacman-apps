@@ -23,6 +23,7 @@
 # desktop needs
 # swappy slurp grim - screenshot (used by the hypr keybindings)
 # tesseract and tesseract-data-eng - OCR screen capture
+# mpv-mpris - lets the playerctl media keys control mpv
 #
 # libqalculate, cliphist and wl-clipboard are NOT dropped -- they moved to
 # ../../common/packages/quickshell-packages, shared by both targets.
@@ -33,6 +34,7 @@ pacman_install \
     neovim \
     yazi resvg \
     ghostty \
+    mpv mpv-mpris \
     swappy slurp grim \
     tesseract tesseract-data-eng
 
@@ -42,7 +44,6 @@ pacman_install \
 # obs-studio \          # screen recording
 # transmission-gtk \    # torrents
 # obsidian \            # notes (df-theme-set's obsidian hook is guarded)
-# mpv \                 # video
 # converseen \          # image conversion
 
 # install gnome apps
@@ -50,6 +51,7 @@ pacman_install \
 # gcr-ssh-agent.service, which is how ssh keys get unlocked on this desktop.
 pacman_install \
     nautilus \
+    ffmpegthumbnailer \
     gnome-disk-utility \
     gnome-keyring libsecret seahorse
 

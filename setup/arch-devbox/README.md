@@ -4,7 +4,7 @@ The [`arch-workstation`](../arch-workstation) desktop, stripped to web developme
 
 Same Hyprland session, same dotfiles, same theming, same system hardening. What
 changes is the app layer: **one browser (helium), two editors (zed, neovim)**,
-and none of the chat/media/notes/torrent packages.
+mpv for video, and none of the chat/notes/torrent packages.
 
 ## order
 
@@ -160,18 +160,19 @@ Culled entries are left in the package files as **commented lines with a
 one-word reason** — uncomment to get any of them back.
 
 **Apps (not development):** discord, obs-studio, transmission-gtk, obsidian,
-mpv, converseen, xournalpp, veracrypt, rclone, net-tools, dosfstools,
+converseen, xournalpp, veracrypt, rclone, net-tools, dosfstools,
 xorg-xhost, nautilus-image-converter, gnome-font-viewer, chromium,
 zen-browser, and the syncthing step.
 
 Yazi, its `resvg` preview dependency, Dragon Drop, and `7zip` stay on the
-devbox.
+devbox. mpv and mpv-mpris were dropped once and are back, matching
+arch-workstation.
 
 **Kept even though it isn't "web dev":** the whole Hyprland layer (uwsm,
 xdg-terminal-exec, quickshell, hyprpolkitagent, the portal,
 hyprsunset, swaybg, brightnessctl, pavucontrol, nwg-look), ghostty, fonts,
-screenshots (swappy/slurp/grim), nautilus, gnome-disk-utility, and the
-Greeter. The desktop is unusable without them.
+screenshots (swappy/slurp/grim), nautilus, ffmpegthumbnailer,
+gnome-disk-utility, and the Greeter. The desktop is unusable without them.
 
 quickshell's own runtime dependencies (`ttf-fira-code`, `libqalculate`,
 `cliphist`, `wl-clipboard`, `libnotify`, `playerctl`) are **not** in any
