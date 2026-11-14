@@ -20,7 +20,7 @@ function fixture(t) {
     fs.writeFileSync(clock, "2026-10-16 09");
     fs.writeFileSync(path.join(bin, "date"), `#!/usr/bin/env bash
 read -r day hour < '${clock}'
-case "$1" in +%H) echo "$hour" ;; +%F) echo "$day" ;; esac
+case "$1" in +%H) echo "$hour" ;; +%F) echo "$day" ;; +%Y-%m) echo "\${day:0:7}" ;; esac
 `);
     fs.writeFileSync(path.join(bin, "sleep"), "#!/usr/bin/env bash\nexit 0\n");
     fs.writeFileSync(path.join(bin, "herdr"), `#!/usr/bin/env bash
@@ -74,7 +74,25 @@ test("the skills tab syncs devvm's agent store after the skills update", t => {
     const h = fixture(t);
     assert.equal(h.run().status, 0);
     const skills = h.calls().find(call => call.includes("pane run") && call.includes("setup-skills"));
-    assert.match(skills, /setup-skills && \{ ! command -v devvm >\/dev\/null \|\| \{ \S*sync-devvm-agents && \S*portable\/bin\/df-devvm-update; \}; \}/);
+    assert.match(skills, /setup-skills && \{ ! command -v devvm >\/dev\/null \|\| \{ \S*sync-devvm-agents && \S*portable\/bin\/df-devvm-update(?: --full && [^;]*)?; \}; \}/);
+});
+
+test("the first update of each month remakes devvm VMs once it succeeds", t => {
+    const h = fixture(t);
+    const monthStamp = path.join(h.env.XDG_STATE_HOME, "dotfiles/devvm-full.last-triggered");
+    const run = (clock) => {
+        h.setClock(clock);
+        const result = h.run(undefined, { DOTFILES_PROFILE: "arch-workstation" });
+        assert.equal(result.status, 0, result.stderr);
+        return h.calls().filter(call => call.includes("pane run")).at(-1);
+    };
+    const full = /df-devvm-update --full && mkdir -p \S+ && echo 2026-1\d > \S+devvm-full\.last-triggered; fi$/;
+    assert.match(run("2026-10-16 09"), full);
+    // The pane hasn't run, so the month isn't claimed yet and the next day retries.
+    assert.match(run("2026-10-17 09"), full);
+    fs.writeFileSync(monthStamp, "2026-10\n");
+    assert.match(run("2026-10-18 09"), /df-devvm-update; fi$/);
+    assert.match(run("2026-11-01 09"), full);
 });
 
 test("Arch workstation updates only devvm settings and VM tools", t => {
@@ -84,7 +102,7 @@ test("Arch workstation updates only devvm settings and VM tools", t => {
     assert.equal(h.calls().filter(call => call.includes("tab create")).length, 1);
     const runs = h.calls().filter(call => call.includes("pane run"));
     assert.equal(runs.length, 1);
-    assert.match(runs[0], /then \S*sync-devvm-agents && \S*portable\/bin\/df-devvm-update; fi/);
+    assert.match(runs[0], /then \S*sync-devvm-agents && \S*portable\/bin\/df-devvm-update(?: --full && [^;]*)?; fi/);
     assert.doesNotMatch(runs[0], /setup-skills|mise up|setup-herdr-integrations/);
 });
 

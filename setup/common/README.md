@@ -93,7 +93,9 @@ updating mise. Other profiles refresh them after the host's `setup-skills` when
 `devvm` is on PATH; otherwise run `setup/common/sync-devvm-agents` and
 `portable/bin/df-devvm-update`. After the sync, `df-update-daily` runs
 `portable/bin/df-devvm-update`, which moves every VM to the newest shared
-tools; see `portable/devvm/README.md` "Updating from the host". Restart the
+tools and runs its update and apt-upgrade hooks. Until one succeeds each
+month, it passes `--full`, which rebuilds the images and remakes the VMs; see
+`portable/devvm/README.md` "Updating from the host". Restart the
 VMs to see new settings. Copied settings keep host paths, such as Claude
 Code's hooks in `~/.claude/hooks` and Codex's project and plugin paths; those
 that don't exist in a VM fail there.

@@ -46,7 +46,15 @@ elif [[ "${HERDR_ENV:-}" != 1 ]]; then
     exit 1
 fi
 
-devvm_cmd=$(printf '%q && %q' "$ARCH_DESKTOP_DIR/setup/common/sync-devvm-agents" "$ARCH_DESKTOP_DIR/portable/bin/df-devvm-update")
+printf -v devvm_cmd '%q && %q' "$ARCH_DESKTOP_DIR/setup/common/sync-devvm-agents" "$ARCH_DESKTOP_DIR/portable/bin/df-devvm-update"
+# The first update of each month also rebuilds images and remakes VMs; only a
+# successful run claims the month. See portable/devvm/README.md.
+month_stamp="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles/devvm-full.last-triggered"
+month=$(date +%Y-%m)
+if [[ ! -f $month_stamp || $(<"$month_stamp") != "$month" ]]; then
+    printf -v devvm_cmd '%s --full && mkdir -p %q && echo %q > %q' \
+        "$devvm_cmd" "${month_stamp%/*}" "$month" "$month_stamp"
+fi
 if [[ ${DOTFILES_PROFILE:-} == arch-workstation ]]; then
     settings_pane=$("${herdr[@]}" tab create --workspace "$HERDR_WORKSPACE_ID" --cwd "$PWD" --label "devvm update" --no-focus | jq -er '.result.root_pane.pane_id')
     "${herdr[@]}" pane run "$settings_pane" "if command -v devvm >/dev/null; then $devvm_cmd; fi"
