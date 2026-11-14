@@ -74,17 +74,17 @@ test("the skills tab syncs devvm's agent store after the skills update", t => {
     const h = fixture(t);
     assert.equal(h.run().status, 0);
     const skills = h.calls().find(call => call.includes("pane run") && call.includes("setup-skills"));
-    assert.match(skills, /setup-skills && \{ ! command -v devvm >\/dev\/null \|\| \S*sync-devvm-agents; \}/);
+    assert.match(skills, /setup-skills && \{ ! command -v devvm >\/dev\/null \|\| \{ \S*sync-devvm-agents && \S*portable\/bin\/df-devvm-update; \}; \}/);
 });
 
-test("Arch workstation updates only devvm settings", t => {
+test("Arch workstation updates only devvm settings and VM tools", t => {
     const h = fixture(t);
     const result = h.run(undefined, { DOTFILES_PROFILE: "arch-workstation" });
     assert.equal(result.status, 0, result.stderr);
     assert.equal(h.calls().filter(call => call.includes("tab create")).length, 1);
     const runs = h.calls().filter(call => call.includes("pane run"));
     assert.equal(runs.length, 1);
-    assert.match(runs[0], /sync-devvm-agents/);
+    assert.match(runs[0], /then \S*sync-devvm-agents && \S*portable\/bin\/df-devvm-update; fi/);
     assert.doesNotMatch(runs[0], /setup-skills|mise up|setup-herdr-integrations/);
 });
 

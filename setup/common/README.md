@@ -88,12 +88,15 @@ and skills repos; see [`portable/devvm/README.md`](../../portable/devvm/README.m
 longer copies host-installed skills.
 
 The settings store is a snapshot. On `arch-workstation`, `df-update-daily`
-refreshes only devvm settings, without installing host skills or updating mise.
-Other profiles refresh it after the host's `setup-skills` when `devvm` is on
-PATH; otherwise run
-`setup/common/sync-devvm-agents`. Restart the VMs to see new settings. Copied
-settings keep host paths, such as Claude Code's hooks in `~/.claude/hooks` and
-Codex's project and plugin paths; those that don't exist in a VM fail there.
+refreshes only devvm settings and VM tools, without installing host skills or
+updating mise. Other profiles refresh them after the host's `setup-skills` when
+`devvm` is on PATH; otherwise run `setup/common/sync-devvm-agents` and
+`portable/bin/df-devvm-update`. After the sync, `df-update-daily` runs
+`portable/bin/df-devvm-update`, which moves every VM to the newest shared
+tools; see `portable/devvm/README.md` "Updating from the host". Restart the
+VMs to see new settings. Copied settings keep host paths, such as Claude
+Code's hooks in `~/.claude/hooks` and Codex's project and plugin paths; those
+that don't exist in a VM fail there.
 
 Existing machines can run `setup/common/setup-devvm` directly.
 
