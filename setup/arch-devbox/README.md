@@ -93,7 +93,6 @@ so a fix there lands on both targets.
 | `packages/pacman-apps` | the cull — this box's app layer, the *whole* package difference from arch-workstation |
 | `packages/yay-packages` | Dragon Drop plus opt-in GUI code editors |
 | `post-install` | same as arch-workstation's, but sets helium as default browser |
-| `setup-mise` | installs mise for this profile's development-tool package list |
 | `setup-sshd` | installs openssh and **enables sshd** — Arch does not. Run by `init` and again by `setup-ufw-lan` |
 | `harden-ssh` | key-only sshd, no root, off port 22 (wrapper over [`dotfiles setup/common/harden-ssh`](https://github.com/Zihad550/dotfiles/blob/main/setup/common/harden-ssh)) |
 | `setup-no-sleep` | masks the sleep targets so the box stays reachable (wrapper over [`dotfiles setup/common/setup-no-sleep`](https://github.com/Zihad550/dotfiles/blob/main/setup/common/setup-no-sleep)) |
@@ -111,8 +110,8 @@ Borrowed unchanged from `../arch-workstation`: `utils/*`, `preflight`, `theme`,
 `gnome-theme`, `keyring`, `setup-omarchy-repos`, and the desktop setup helpers.
 `logo.txt` is this directory's own; `utils/logging` loads the one next to
 `$ARCH_SETUP_INIT`. The workstation-specific Syncthing and firewall steps are not
-shared. Mise is another exception: Arch workstation no longer installs it, so
-this profile owns `setup-mise`.
+shared. Both Arch profiles install mise with
+[`../common/setup-mise`](../common/setup-mise).
 The shared package lists this box runs live in
 [`../common/packages`](../common/packages): `pacman-base` and
 `quickshell-packages`. The devbox has a local

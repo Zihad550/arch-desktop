@@ -93,7 +93,7 @@ run_step "gnome-theme" "$ARCH_WORKSTATION_DIR/gnome-theme"
 # The omarchy repo is required, not optional: worktrunk and quickshell both
 # come from it.
 run_step "omarchy repos" "$ARCH_WORKSTATION_DIR/setup-omarchy-repos"
-run_step "mise" "$ARCH_DEVBOX_DIR/setup-mise"
+run_step "mise" "$ARCH_DESKTOP_DIR/setup/common/setup-mise"
 run_step "yay" "$ARCH_DEVBOX_DIR/setup-yay"
 
 # flatpak dropped — its only dev-relevant apps were MongoDB Compass and
@@ -138,8 +138,6 @@ run_step "quickshell packages" "$ARCH_DESKTOP_DIR/setup/common/packages/quickshe
 # Rootless -- this box runs AI harnesses against text pulled off the internet.
 # See ../common/setup-rootless-docker and README.md "docker".
 run_step "docker" "$ARCH_DESKTOP_DIR/setup/common/setup-rootless-docker"
-# pacman, so not in the tools lane. See ../common/README.md "devvm".
-run_step "devvm" "$ARCH_DESKTOP_DIR/setup/common/setup-devvm"
 
 # sshd before the firewall: once setup-ufw runs, sshd over the tailnet is the
 # only remote access path, and Arch does not enable sshd itself.
@@ -180,6 +178,8 @@ run_step "kanata" "$ARCH_DESKTOP_DIR/setup/common/setup-kanata"
 
 join_lane tools
 run_step "herdr" "$ARCH_DESKTOP_DIR/portable/setup/common/setup-herdr"
+# pacman, so not in the tools lane. See ../common/README.md "devvm".
+run_step "devvm" "$ARCH_DESKTOP_DIR/setup/common/setup-devvm"
 
 # setup-github-cli intentionally not run — needs `gh auth login` first.
 # Run manually after login: ~/arch-desktop/bin/df-arch-devbox-post-install

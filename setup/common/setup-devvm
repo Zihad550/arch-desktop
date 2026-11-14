@@ -7,7 +7,7 @@ set -euo pipefail
 . "$(dirname "${BASH_SOURCE[0]}")/pacman-lib"
 
 # minisign also lets install.sh check the devvm binary it downloads.
-pacman_install qemu-base minisign
+pacman_install qemu-base minisign rsync
 
 export PATH="$HOME/.local/bin:$PATH"
 
@@ -31,3 +31,5 @@ if [[ ! -f "$HOME/.config/devvm/layers/shell.sh" ]]; then
     exit 1
 fi
 devvm setup --layers shell --no-input
+
+"$(dirname "${BASH_SOURCE[0]}")/sync-devvm-agents"

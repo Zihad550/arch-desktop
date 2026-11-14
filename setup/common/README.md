@@ -30,11 +30,13 @@ dotfiles' `setup/common/`. Installers here call them through
 | [`setup-kanata`](setup-kanata) | Installs Kanata (Arch only, via yay) and runs it as a system service on the saved profile selection. | Arch Workstation, Arch devbox |
 | [`setup-power-button-suspend`](setup-power-button-suspend) | Makes a short power-button press suspend and a long press power off. | Arch Workstation, Arch devbox |
 | [`setup-rootless-docker`](setup-rootless-docker) | Replaces rootful Docker with a per-user daemon. | Arch devbox |
-| [`setup-skills`](../../portable/setup/common/setup-skills) | Installs the shared agent skill set. | Arch and Ubuntu setup |
+| [`setup-mise`](setup-mise) | Installs mise from pacman, with `usage` for its completions. | Arch devbox |
+| [`setup-skills`](../../portable/setup/common/setup-skills) | Installs the shared agent skill set. | Arch devbox, Ubuntu, and shell-layer VM setup |
 | [`setup-snapper`](setup-snapper) | Applies the root filesystem snapshot-retention policy. | Arch devbox |
 | [`setup-sudo-password-feedback`](setup-sudo-password-feedback) | Shows asterisks while a user types a sudo password. | Arch Workstation, Arch devbox |
 | [`setup-ts-serve`](setup-ts-serve) | Grants passwordless `ts-serve` through a validating root wrapper. | Arch devbox |
 | [`setup-voxtype`](setup-voxtype) | Installs local voice dictation, its model, and user service. | Arch Workstation, Arch devbox |
+| [`sync-devvm-agents`](sync-devvm-agents) | Copies the agents' dotfiles settings into devvm's agent store. | `setup-devvm`, `df-update-daily` |
 
 ### Support and package input
 
@@ -63,9 +65,9 @@ version and checksum in the installer. Existing machines can run
 ## devvm
 
 Both Arch profiles run `setup-devvm` for [devvm](https://devvm.dev) sandbox
-VMs. It installs `qemu-base` and `minisign` with pacman, then devvm's latest
-release with devvm's own install script. That script also installs Lima, which
-Arch doesn't package, into `~/.local`. Before it runs, `SHA256SUMS` must carry
+VMs. It installs `qemu-base`, `minisign` and `rsync` with pacman, then devvm's
+latest release with devvm's own install script. That script also installs Lima,
+which Arch doesn't package, into `~/.local`. Before it runs, `SHA256SUMS` must carry
 devvm's minisign signature and match `install.sh`; with minisign installed, the
 install script checks the devvm binary the same way.
 
@@ -75,8 +77,25 @@ when one of its dependency fixes fails. When `/dev/kvm` isn't writable, the
 install script adds the user to the `kvm` group, which applies from the next
 login. Every run sets the `shell` layer as the default for new VMs, and fails
 if stow hasn't linked the layers folder yet (see
-[`portable/devvm/README.md`](../../portable/devvm/README.md)). Existing machines can run
-`setup/common/setup-devvm` directly.
+[`portable/devvm/README.md`](../../portable/devvm/README.md)).
+
+It ends by running `sync-devvm-agents`, which copies the git-tracked files of
+the `claude`, `codex` and `opencode` packages into devvm's agent store. It doesn't
+use `devvm agent import`, which skips stow's links and would replace the logins
+VMs saved with the host's. Skills are installed inside each shell-layer VM by
+[`portable/setup/devvm/setup-skills`](../devvm/setup-skills), using the cloned dotfiles
+and skills repos; see [`portable/devvm/README.md`](../../portable/devvm/README.md). The sync no
+longer copies host-installed skills.
+
+The settings store is a snapshot. On `arch-workstation`, `df-update-daily`
+refreshes only devvm settings, without installing host skills or updating mise.
+Other profiles refresh it after the host's `setup-skills` when `devvm` is on
+PATH; otherwise run
+`setup/common/sync-devvm-agents`. Restart the VMs to see new settings. Copied
+settings keep host paths, such as Claude Code's hooks in `~/.claude/hooks` and
+Codex's project and plugin paths; those that don't exist in a VM fail there.
+
+Existing machines can run `setup/common/setup-devvm` directly.
 
 ## Boot Branding
 
@@ -249,12 +268,17 @@ Re-running it synchronizes the declared set. Add upstream skills to the
 appropriate install block; add repository-owned skills to
 `github.com/Zihad550/skills` before listing them here.
 
-Update skills by re-running `setup-skills`, as `df-update-daily` does. Avoid
+Update skills by re-running `setup-skills`, as `df-update-daily` does on profiles
+other than `arch-workstation` before it
+syncs devvm's settings store (see "devvm"). Inside a shell-layer VM, run
+`bash /opt/dotfiles/setup/devvm/setup-skills` instead. Avoid
 `skills update -g`: it reinstalls without `--agent`, so each updated skill is
 linked into every detected agent. That includes `~/.claude/skills`, which
 duplicates skills the Claude plugin already ships (e.g. mattpocock's).
 
 It also installs the Claude Code mods in `portable/claude/.claude/mods` (a local
 marketplace named `dotfiles-mods`) when `claude` is on `PATH`. Claude Code reads
-them in place, so edits need only `/reload-plugins`.
+them in place, so edits need only `/reload-plugins`. `stow-ai` links the local
+marketplace at `~/.claude/mods`. The installed mods are `drafts` (draft previews)
+and `lazy-diff` (Git review and file staging via `/lazy-diff`).
 

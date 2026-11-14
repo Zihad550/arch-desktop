@@ -95,17 +95,18 @@ test("Arch devbox excludes workstation sync", () => {
     assert.match(packages, /dragon-drop/);
 });
 
-test("mise installation belongs to Arch devbox, not Arch workstation", () => {
-    const workstation = source("setup/arch-workstation/init");
-    const devbox = source("setup/arch-devbox/init");
+test("Arch workstation keeps development tools inside devvm", () => {
+    const init = source("setup/arch-workstation/init");
+    assert.doesNotMatch(init, /setup-mise|mise-dev-packages|setup-skills/);
+    assert.match(init, /run_step "devvm" "\$ARCH_DESKTOP_DIR\/setup\/common\/setup-devvm"/);
+});
 
-    assert.doesNotMatch(workstation, /setup-mise|mise packages/);
-    assert.match(devbox, /\$ARCH_DEVBOX_DIR\/setup-mise/);
-    assert.ok(fs.existsSync(path.join(repoRoot, "setup/arch-devbox/setup-mise")));
-    assert.ok(!fs.existsSync(path.join(repoRoot,
-        "setup/arch-workstation/setup-packages/setup-mise")));
-    assert.ok(!fs.existsSync(path.join(repoRoot,
-        "setup/arch-workstation/packages/mise-packages")));
+test("Arch devbox installs mise and skills before devvm", () => {
+    assert.ok(fs.existsSync(path.join(repoRoot, "setup/common/setup-mise")));
+    const init = source("setup/arch-devbox/init");
+    assert.match(init,
+        /run_step "mise" "\$ARCH_DESKTOP_DIR\/setup\/common\/setup-mise"[\s\S]*run_step "mise packages"[\s\S]*run_step "skills"/);
+    assert.match(init, /join_lane tools[\s\S]*run_step "devvm"/);
 });
 
 test("Arch installers call the shared helpers through the portable checkout", () => {
@@ -148,11 +149,14 @@ test("Arch devbox installs DNS after the base packages", () => {
 test("generated completions replace shell-startup generators", () => {
     const generator = source("portable/bin/df-gen-completions");
     const zshrc = source("portable/zsh/.config/zsh/.zshrc");
-    const setupMise = source("setup/arch-devbox/setup-mise");
+    const setupMise = source("setup/common/setup-mise");
 
     assert.match(generator, /^gen mise mise completion zsh$/m);
     assert.match(generator, /^gen kubectl kubectl completion zsh$/m);
     assert.match(generator, /^gen herdr herdr completion zsh$/m);
+    assert.doesNotMatch(generator, /^gen devvm /m);
+    assert.doesNotMatch(source("setup/arch-workstation/setup-completions"), /devvm/);
+    assert.match(zshrc, /if commands_available devvm; then eval "\$\(devvm completion zsh\)"; fi/);
     assert.doesNotMatch(zshrc, /kubectl completion zsh|herdr completion zsh/);
     assert.doesNotMatch(setupMise, /mise completion zsh|site-functions/);
 });
