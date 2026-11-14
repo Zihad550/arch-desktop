@@ -23,7 +23,7 @@ Singleton {
     property string statusClass: ""
     property string tooltip: ""
 
-    // Account-level tailnet name (e.g. "example.com"); "" when not connected.
+    // Account-level tailnet name (e.g. "mamacrm.com"); "" when not connected.
     // Assigned unconditionally from every status line so a disconnect cannot
     // leave a stale name standing next to an inactive tile.
     property string tailnet: ""

@@ -11,7 +11,7 @@ const SHARED_LAUNCHER = path.join(ROOT, "bin/df-launch-special-workspace");
 const WEB_APPS = [
     ["Calendar", "chrome-calendar.google.com__calendar-Profile_2", "https://calendar.google.com/calendar", "calendar"],
     ["Meet", "chrome-meet.google.com__-Profile_2", "https://meet.google.com", "meet"],
-    ["Zulip", "chrome-zulip.example.com__-Profile_2", "https://zulip.example.com", "zulip"],
+    ["Zulip", "chrome-mamacrm.zulipchat.com__-Profile_2", "https://mamacrm.zulipchat.com", "zulip"],
     ["YouTube", "chrome-www.youtube.com__-Profile_2", "https://www.youtube.com", "yt"],
     ["Linear", "chrome-linear.app__-Profile_2", "https://linear.app/", "tasks"],
     ["Figma", "chrome-www.figma.com__-Profile_2", "https://www.figma.com", "figma"],

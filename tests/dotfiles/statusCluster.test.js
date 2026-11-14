@@ -92,19 +92,19 @@ exit 1`);
 test("connected status carries the tailnet name", async t => {
     const status = await tailscaleStatus(t, `
 if [ "$1" = "status" ]; then
-    printf '%s\\n' '{"BackendState":"Running","CurrentTailnet":{"Name":"example.com"},"TailscaleIPs":["100.64.0.1"]}'
+    printf '%s\\n' '{"BackendState":"Running","CurrentTailnet":{"Name":"mamacrm.com"},"TailscaleIPs":["100.64.0.1"]}'
     exit 0
 fi
 exit 1`);
 
     assert.strictEqual(status.class, "connected");
-    assert.strictEqual(status.tailnet, "example.com");
+    assert.strictEqual(status.tailnet, "mamacrm.com");
 });
 
 test("disconnected status clears the tailnet name", async t => {
     const status = await tailscaleStatus(t, `
 if [ "$1" = "status" ]; then
-    printf '%s\\n' '{"BackendState":"Stopped","CurrentTailnet":{"Name":"example.com"}}'
+    printf '%s\\n' '{"BackendState":"Stopped","CurrentTailnet":{"Name":"mamacrm.com"}}'
     exit 0
 fi
 exit 1`);

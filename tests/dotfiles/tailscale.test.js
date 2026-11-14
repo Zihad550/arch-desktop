@@ -307,9 +307,9 @@ test("df-tailscale reports a cleaned exit 4 for an access-denied profiles listin
 test("the model normalizes Profiles in order and displays only the Tailnet", () => {
     const raw = JSON.stringify([
         { id: "1", tailnet: "example.ts.net", account: "user@example.com", nickname: "", selected: false },
-        { id: "2", tailnet: "personal.example.ts.net", account: "user@personal.com", nickname: "Home", selected: true },
+        { id: "2", tailnet: "personal.ts.net", account: "user@personal.com", nickname: "Home", selected: true },
         { id: "3", tailnet: "", account: "", nickname: "", selected: false },
-        { id: "4", tailnet: "solo.example.ts.net", account: "solo.example.ts.net", nickname: "", selected: false },
+        { id: "4", tailnet: "solo.ts.net", account: "solo.ts.net", nickname: "", selected: false },
     ]);
 
     const result = Model.classifyProfiles(0, raw, "");
@@ -322,9 +322,9 @@ test("the model normalizes Profiles in order and displays only the Tailnet", () 
     // The Tailnet is the useful distinction in Quick Settings. Other fields
     // only keep malformed or older CLI output from producing a blank Row.
     assert.equal(result.profiles[0].label, "example.ts.net");
-    assert.equal(result.profiles[1].label, "personal.example.ts.net");
+    assert.equal(result.profiles[1].label, "personal.ts.net");
     assert.equal(result.profiles[2].label, "3");
-    assert.equal(result.profiles[3].label, "solo.example.ts.net");
+    assert.equal(result.profiles[3].label, "solo.ts.net");
 
     assert.equal("detail" in result.profiles[0], false);
 
@@ -1020,7 +1020,7 @@ test("`profiles --no-elevate` still returns a list when the unprivileged call su
     try {
         const result = runProfiles(fakeDirectory, {
             extraArgs: ["--no-elevate"],
-            stdout: '[{"id":"p1","tailnet":"one.example.ts.net","account":"a@example.com","nickname":"","selected":true}]',
+            stdout: '[{"id":"p1","tailnet":"one.ts.net","account":"a@example.com","nickname":"","selected":true}]',
             pkexecLog,
         });
 
@@ -1034,11 +1034,11 @@ test("`profiles --no-elevate` still returns a list when the unprivileged call su
 
 test("the daemon's current Tailnet moves the marker when the listing could not be refreshed", () => {
     const profiles = Model.normalizeProfiles([
-        { id: "p1", tailnet: "one.example.ts.net", account: "a@example.com", selected: true },
-        { id: "p2", tailnet: "two.example.ts.net", account: "b@example.com", selected: false },
+        { id: "p1", tailnet: "one.ts.net", account: "a@example.com", selected: true },
+        { id: "p2", tailnet: "two.ts.net", account: "b@example.com", selected: false },
     ]);
 
-    const moved = Model.withCurrentTailnet(profiles, "two.example.ts.net");
+    const moved = Model.withCurrentTailnet(profiles, "two.ts.net");
     assert.deepStrictEqual(moved.map(p => p.current), [false, true]);
     assert.deepStrictEqual(
         moved.map(p => p.label),
@@ -1049,12 +1049,12 @@ test("the daemon's current Tailnet moves the marker when the listing could not b
     // nothing confirmed yet, or a name that matches no Profile: a stale
     // marker beats a guessed one
     assert.deepStrictEqual(Model.withCurrentTailnet(profiles, "").map(p => p.current), [true, false]);
-    assert.deepStrictEqual(Model.withCurrentTailnet(profiles, "other.example.ts.net").map(p => p.current), [true, false]);
+    assert.deepStrictEqual(Model.withCurrentTailnet(profiles, "other.ts.net").map(p => p.current), [true, false]);
 
     // two Profiles on one Tailnet cannot be told apart by Tailnet alone
     const shared = Model.normalizeProfiles([
-        { id: "p1", tailnet: "one.example.ts.net", account: "a@example.com", selected: true },
-        { id: "p2", tailnet: "one.example.ts.net", account: "b@example.com", selected: false },
+        { id: "p1", tailnet: "one.ts.net", account: "a@example.com", selected: true },
+        { id: "p2", tailnet: "one.ts.net", account: "b@example.com", selected: false },
     ]);
-    assert.deepStrictEqual(Model.withCurrentTailnet(shared, "one.example.ts.net").map(p => p.current), [true, false]);
+    assert.deepStrictEqual(Model.withCurrentTailnet(shared, "one.ts.net").map(p => p.current), [true, false]);
 });

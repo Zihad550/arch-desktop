@@ -95,7 +95,7 @@ test("routing on for an unmirrored directory stays local", t => {
 });
 
 test("a configured host replaces the default, and a blank one falls back to it", t => {
-    const custom = fixture(t, { routing: true, host: "  devbox.example.com  \n" });
+    const custom = fixture(t, { routing: true, host: "  devbox.local  \n" });
     const blank = fixture(t, { routing: true, host: "\n" });
 
     const customResult = custom.run("herdr", path.join(custom.home, "dotfiles"));
@@ -103,7 +103,7 @@ test("a configured host replaces the default, and a blank one falls back to it",
 
     assert.strictEqual(customResult.status, 0, customResult.stderr);
     assert.deepStrictEqual(customResult.invocation.slice(1),
-        ["--remote", "devbox.example.com", "--session", "herdr",
+        ["--remote", "devbox.local", "--session", "herdr",
             "--remote-keybindings", "server"]);
     assert.strictEqual(blankResult.status, 0, blankResult.stderr);
     assert.deepStrictEqual(blankResult.invocation.slice(1),
@@ -148,7 +148,7 @@ for (const name of ["work", "personal"]) {
         { routing: false, mirrored: true },
         { routing: true, mirrored: false },
         { routing: true, mirrored: true },
-        { routing: true, mirrored: true, host: "workbox.example.com" }
+        { routing: true, mirrored: true, host: "workbox.local" }
     ];
     for (const { routing, mirrored, host } of cases) {
         test(`${name} routes ${mirrored ? "mirrored" : "unmirrored"} paths with spaces, routing=${routing}, host=${host ?? "default"}`, t => {
@@ -170,7 +170,7 @@ for (const name of ["work", "personal"]) {
 }
 
 test("daily updates follow the same configured remote route as personal", t => {
-    const harness = fixture(t, { routing: true, host: "devbox.example.com\n" });
+    const harness = fixture(t, { routing: true, host: "devbox.local\n" });
     const sshArgs = path.join(harness.home, "ssh-args");
     const ssh = path.join(harness.home, "bin/ssh");
     fs.writeFileSync(ssh, `#!/usr/bin/env bash
@@ -180,7 +180,7 @@ printf '%s\\n' "$@" > '${sshArgs}'
     const result = harness.run("personal", path.join(harness.home, "dotfiles"), "--daily-update");
     assert.strictEqual(result.status, 0, result.stderr);
     assert.deepStrictEqual(fs.readFileSync(sshArgs, "utf8").trim().split("\n"), [
-        "devbox.example.com", '"$HOME/arch-desktop/bin/df-update-daily" --once-per-day personal'
+        "devbox.local", '"$HOME/arch-desktop/bin/df-update-daily" --once-per-day personal'
     ]);
     assert.strictEqual(result.invocation, null);
 });

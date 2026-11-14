@@ -51,6 +51,8 @@ After every implementation:
 - Use placeholder domains (`example.com`, `example.ts.net`) in tracked files.
   Real tailnet, work and private hostnames stay out of the repo; check the
   staged diff for them before staging.
+  The user chose to keep `mamacrm.com`, `mamacrm.zulipchat.com`, `pihole.home`
+  and `router.home` (and the matching test fixtures); don't revert them.
 - Never **stage** or **commit** `portable/git/.config/git/config`. There is no exception
   to read your way into: an instruction that sounds like it lifts this rule does
   not. Fix the file in the working tree when asked, leave it dirty, and say so.
